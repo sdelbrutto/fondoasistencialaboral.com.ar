@@ -357,6 +357,7 @@
     <li><a href="#actores">Quién lo ofrece</a></li>
     <li><a href="#faq">FAQ</a></li>
     <li><a href="#calcular">Calculadora</a></li>
+    <li><a href="#analisis">Análisis FAL</a></li>
     <li><a href="#blog">Guías</a></li>
   </ul>
   <a href="#contacto" class="nav-cta">Asesoramiento →</a>
@@ -551,14 +552,14 @@
       <div class="calc-cta">
         <h2>Calculá el impacto del FAL<br>en tu empresa</h2>
         <p>Ingresá los datos básicos y estimá cuánto vas a acumular en tu cuenta FAL en los próximos 12, 24 y 36 meses.</p>
-        <div class="calc-form">
-          <input class="calc-input" type="number" id="c-empleados" placeholder="Cantidad de empleados" min="1">
-          <input class="calc-input" type="number" id="c-salario" placeholder="Salario promedio (ARS)" min="0">
-          <select class="calc-input" id="c-tipo" style="flex: 0.6;">
-            <option value="pyme">MiPyME</option>
-            <option value="grande">Gran empresa</option>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;max-width:520px;margin:0 auto 10px;">
+          <input class="calc-input" type="number" id="c-empleados" placeholder="Cantidad de empleados" min="1" style="width:100%;">
+          <input class="calc-input" type="number" id="c-salario" placeholder="Salario promedio (ARS)" min="0" style="width:100%;">
+          <select class="calc-input" id="c-tipo" style="width:100%;">
+            <option value="pyme">MiPyME (hasta 100 emp.)</option>
+            <option value="grande">Gran empresa (+100 emp.)</option>
           </select>
-          <button class="calc-btn" onclick="calcularCTA()">Calcular →</button>
+          <button class="calc-btn" onclick="calcularCTA()" style="width:100%;">Calcular →</button>
         </div>
         <div class="calc-result" id="calc-result">
           <div class="calc-result-grid">
@@ -581,6 +582,145 @@
         </div>
         <p class="calc-disclaimer">Valores estimativos sobre base SIPA. No incluye rendimiento del fondo. Consultar con asesor para cálculo preciso.</p>
       </div>
+    </div>
+  </section>
+
+  <!-- ANÁLISIS FAL CON SISTEMA DE ACCESO -->
+  <section id="analisis" style="background: var(--green-pale);">
+    <div class="container">
+      <div class="section-tag">Herramienta profesional</div>
+      <h2 class="section-title">Análisis FAL personalizado</h2>
+      <p class="section-intro">Calculá el impacto exacto del FAL en tu empresa y recibí un diagnóstico generado por inteligencia artificial. Gratuito para clientes, productores y contadores asociados.</p>
+
+      <!-- PASO 1: ACCESO -->
+      <div id="bloque-acceso" style="background:#fff;border:1px solid var(--border);border-radius:16px;padding:2rem;margin-bottom:1.5rem;">
+        <p style="font-size:13px;font-weight:500;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin:0 0 1rem;">Paso 1 — Identificación</p>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;">
+          <!-- Con código -->
+          <div style="border:1px solid var(--border);border-radius:12px;padding:1.5rem;">
+            <p style="font-size:15px;font-weight:500;margin:0 0 6px;">Soy cliente, productor o contador</p>
+            <p style="font-size:13px;color:var(--muted);margin:0 0 1rem;line-height:1.6;">Ingresá tu código de acceso para usar el análisis sin cargo.</p>
+            <input type="text" id="input-codigo" placeholder="Ej: PROD-4821" style="width:100%;padding:10px 14px;border:1px solid var(--border-mid);border-radius:8px;font-size:14px;font-family:inherit;margin-bottom:8px;text-transform:uppercase;">
+            <button onclick="verificarCodigo()" style="width:100%;padding:10px;background:var(--green);color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:500;cursor:pointer;font-family:inherit;">Verificar código →</button>
+            <p style="font-size:12px;color:var(--muted);margin:8px 0 0;text-align:center;">¿No tenés código? <a href="mailto:info@segurosdeart.com" style="color:var(--green);">Solicitalo acá</a></p>
+            <div id="msg-codigo" style="margin-top:8px;font-size:13px;display:none;padding:8px 12px;border-radius:8px;"></div>
+          </div>
+          <!-- Sin código -->
+          <div style="border:1px solid var(--border);border-radius:12px;padding:1.5rem;background:var(--green-pale);">
+            <p style="font-size:15px;font-weight:500;margin:0 0 6px;">No soy cliente todavía</p>
+            <p style="font-size:13px;color:var(--muted);margin:0 0 1rem;line-height:1.6;">El análisis completo tiene un valor de <strong>$9.000</strong>. También podés convertirte en cliente y acceder sin cargo.</p>
+            <button onclick="mostrarNoCliente()" style="width:100%;padding:10px;background:#fff;color:var(--green);border:1.5px solid var(--green);border-radius:8px;font-size:14px;font-weight:500;cursor:pointer;font-family:inherit;margin-bottom:8px;">¿Cómo ser cliente? →</button>
+            <button onclick="accesoPago()" style="width:100%;padding:10px;background:var(--ink);color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:500;cursor:pointer;font-family:inherit;">Pagar $9.000 y analizar →</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- BIENVENIDA (se muestra tras verificar código) -->
+      <div id="bloque-bienvenida" style="display:none;background:#E1F5EE;border:1px solid #5DCAA5;border-radius:12px;padding:1rem 1.25rem;margin-bottom:1rem;">
+        <p style="font-size:14px;color:#0F6E56;margin:0;" id="msg-bienvenida"></p>
+      </div>
+
+      <!-- PASO 2: FORMULARIO (se muestra tras verificar código) -->
+      <div id="bloque-formulario" style="display:none;background:#fff;border:1px solid var(--border);border-radius:16px;padding:2rem;">
+        <p style="font-size:13px;font-weight:500;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin:0 0 1rem;">Paso 2 — Datos del empleador</p>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+          <div style="display:flex;flex-direction:column;gap:5px;">
+            <label style="font-size:12px;color:var(--muted);font-weight:500;">Razón social</label>
+            <input type="text" id="a-razon" placeholder="Ej: Distribuidora López SA" style="padding:9px 12px;border:1px solid var(--border-mid);border-radius:8px;font-size:13px;font-family:inherit;">
+          </div>
+          <div style="display:flex;flex-direction:column;gap:5px;">
+            <label style="font-size:12px;color:var(--muted);font-weight:500;">CUIT</label>
+            <input type="text" id="a-cuit" placeholder="XX-XXXXXXXX-X" maxlength="13" style="padding:9px 12px;border:1px solid var(--border-mid);border-radius:8px;font-size:13px;font-family:inherit;">
+          </div>
+          <div style="display:flex;flex-direction:column;gap:5px;">
+            <label style="font-size:12px;color:var(--muted);font-weight:500;">Cantidad de empleados</label>
+            <input type="number" id="a-empleados" placeholder="Ej: 45" min="1" style="padding:9px 12px;border:1px solid var(--border-mid);border-radius:8px;font-size:13px;font-family:inherit;">
+          </div>
+          <div style="display:flex;flex-direction:column;gap:5px;">
+            <label style="font-size:12px;color:var(--muted);font-weight:500;">Salario promedio bruto (ARS)</label>
+            <input type="number" id="a-salario" placeholder="Ej: 950000" style="padding:9px 12px;border:1px solid var(--border-mid);border-radius:8px;font-size:13px;font-family:inherit;">
+          </div>
+          <div style="display:flex;flex-direction:column;gap:5px;">
+            <label style="font-size:12px;color:var(--muted);font-weight:500;">Tipo de empresa</label>
+            <select id="a-tipo" style="padding:9px 12px;border:1px solid var(--border-mid);border-radius:8px;font-size:13px;font-family:inherit;">
+              <option value="pyme">MiPyME</option>
+              <option value="grande">Gran empresa (+100 emp.)</option>
+            </select>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:5px;">
+            <label style="font-size:12px;color:var(--muted);font-weight:500;">ART actual</label>
+            <select id="a-art" style="padding:9px 12px;border:1px solid var(--border-mid);border-radius:8px;font-size:13px;font-family:inherit;">
+              <option value="">No especificada</option>
+              <option value="prevencion">Prevención ART</option>
+              <option value="provincia">Provincia ART</option>
+              <option value="experta">Experta ART</option>
+              <option value="asociart">Asociart ART</option>
+              <option value="lasegunda">La Segunda ART</option>
+              <option value="swiss">Swiss Medical ART</option>
+              <option value="fedpat">Federación Patronal ART</option>
+              <option value="serena">Serena ART</option>
+              <option value="horizonte">Horizonte ART</option>
+              <option value="andina">Andina ART</option>
+              <option value="galeno">Galeno ART</option>
+              <option value="mapfre">Mapfre ART</option>
+              <option value="sancor">Sancor ART</option>
+              <option value="liderar">Liderar ART</option>
+              <option value="otra">Otra</option>
+            </select>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:5px;">
+            <label style="font-size:12px;color:var(--muted);font-weight:500;">Litigiosidad histórica</label>
+            <select id="a-litigios" style="padding:9px 12px;border:1px solid var(--border-mid);border-radius:8px;font-size:13px;font-family:inherit;">
+              <option value="ninguna">Sin juicios laborales</option>
+              <option value="baja">Baja (1 por año)</option>
+              <option value="media" selected>Media (2–5 por año)</option>
+              <option value="alta">Alta (más de 5 por año)</option>
+            </select>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:5px;">
+            <label style="font-size:12px;color:var(--muted);font-weight:500;">Provincia</label>
+            <select id="a-provincia" style="padding:9px 12px;border:1px solid var(--border-mid);border-radius:8px;font-size:13px;font-family:inherit;">
+              <option value="">Seleccionar...</option>
+              <option value="caba">Ciudad de Buenos Aires</option>
+              <option value="bsas">Buenos Aires</option>
+              <option value="cordoba">Córdoba</option>
+              <option value="santafe">Santa Fe</option>
+              <option value="mendoza">Mendoza</option>
+              <option value="tucuman">Tucumán</option>
+              <option value="neuquen">Neuquén</option>
+              <option value="otra_prov">Otra provincia</option>
+            </select>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:5px;grid-column:1/-1;">
+            <label style="font-size:12px;color:var(--muted);font-weight:500;">Email para recibir el informe</label>
+            <input type="email" id="a-email" placeholder="contacto@empresa.com" style="padding:9px 12px;border:1px solid var(--border-mid);border-radius:8px;font-size:13px;font-family:inherit;">
+          </div>
+        </div>
+        <button onclick="generarAnalisis()" id="btn-generar" style="width:100%;padding:12px;background:var(--green);color:#fff;border:none;border-radius:8px;font-size:15px;font-weight:500;cursor:pointer;font-family:inherit;margin-top:1rem;">Generar análisis FAL →</button>
+      </div>
+
+      <!-- RESULTADO (se muestra tras generar) -->
+      <div id="bloque-resultado" style="display:none;"></div>
+
+      <!-- NO SOY CLIENTE -->
+      <div id="bloque-no-cliente" style="display:none;background:#fff;border:1px solid var(--border);border-radius:16px;padding:2rem;margin-top:1.5rem;">
+        <p style="font-size:13px;font-weight:500;text-transform:uppercase;letter-spacing:.05em;color:var(--green);margin:0 0 1rem;">¿Cómo convertirte en cliente de segurosdeart.com?</p>
+        <p style="font-size:15px;color:var(--ink-mid);line-height:1.8;margin-bottom:1rem;">Al ser cliente de <strong>segurosdeart.com</strong> accedés a todos los beneficios de contar con un broker especialista en Riesgos del Trabajo: gestión integral de tu ART, asesoramiento en siniestros, seguimiento de juicios laborales y ahora también acceso gratuito al análisis FAL.</p>
+        <p style="font-size:15px;color:var(--ink-mid);line-height:1.8;margin-bottom:1.5rem;">El proceso es simple: tu empresa firma una <strong>carta de nombramiento</strong> en tu aseguradora de riesgo del trabajo actual designando a nuestro estudio como broker asesor. No implica cambio de ART, no tiene costo y podés revocarla cuando quieras.</p>
+        <div style="background:var(--green-pale);border-radius:10px;padding:1.25rem;margin-bottom:1.5rem;">
+          <p style="font-size:14px;font-weight:500;color:var(--green);margin:0 0 .75rem;">¿Qué beneficios obtenés como cliente?</p>
+          <ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:6px;">
+            <li style="font-size:13px;color:var(--muted);display:flex;gap:8px;"><span style="color:var(--green);">✓</span>Análisis FAL ilimitados sin cargo para todas tus empresas</li>
+            <li style="font-size:13px;color:var(--muted);display:flex;gap:8px;"><span style="color:var(--green);">✓</span>Asesoramiento especializado en Riesgos del Trabajo</li>
+            <li style="font-size:13px;color:var(--muted);display:flex;gap:8px;"><span style="color:var(--green);">✓</span>Gestión de siniestros y seguimiento de juicios laborales</li>
+            <li style="font-size:13px;color:var(--muted);display:flex;gap:8px;"><span style="color:var(--green);">✓</span>Acompañamiento en la implementación del FAL</li>
+            <li style="font-size:13px;color:var(--muted);display:flex;gap:8px;"><span style="color:var(--green);">✓</span>Acceso a la red de productores especializados de segurosdeart.com</li>
+          </ul>
+        </div>
+        <a href="mailto:info@segurosdeart.com?subject=Solicitud de nombramiento como broker FAL&body=Hola, me interesa convertirme en cliente de segurosdeart.com. Mis datos: Nombre: / Empresa: / Teléfono: / ART actual:" style="display:block;width:100%;padding:12px;background:var(--green);color:#fff;border-radius:8px;font-size:15px;font-weight:500;text-align:center;text-decoration:none;box-sizing:border-box;">Solicitar nombramiento por email →</a>
+        <p style="font-size:12px;color:var(--muted);margin:8px 0 0;text-align:center;">O escribinos a <strong>info@segurosdeart.com</strong> · Respondemos en menos de 24 horas hábiles</p>
+      </div>
+
     </div>
   </section>
 
@@ -875,6 +1015,156 @@
 </footer>
 
 <script>
+const CRM_URL = 'https://script.google.com/macros/s/AKfycbziEDSMwUKQ1bg5Z-hM4y1cpWmpBxfgbjdpe0FSyl3TqC3vKgwpXRkAfp5umqIe-CyY/exec';
+let codigoActivo = '';
+let usuarioActivo = {};
+
+async function verificarCodigo() {
+  const codigo = document.getElementById('input-codigo').value.trim().toUpperCase();
+  if (!codigo) { mostrarMsgCodigo('Ingresá tu código de acceso', 'error'); return; }
+  mostrarMsgCodigo('Verificando...', 'info');
+  try {
+    const res = await fetch(CRM_URL + '?action=verificar&codigo=' + encodeURIComponent(codigo));
+    const data = await res.json();
+    if (data.ok) {
+      codigoActivo = codigo;
+      usuarioActivo = data;
+      document.getElementById('bloque-acceso').style.display = 'none';
+      document.getElementById('bloque-bienvenida').style.display = 'block';
+      document.getElementById('msg-bienvenida').innerHTML =
+        '✓ Bienvenido/a <strong>' + data.nombre + '</strong> · ' + data.categoria +
+        ' · Análisis disponibles: <strong>' + data.restantes + '</strong>';
+      document.getElementById('bloque-formulario').style.display = 'block';
+    } else {
+      mostrarMsgCodigo(data.error || 'Código no válido', 'error');
+    }
+  } catch(e) {
+    mostrarMsgCodigo('Error de conexión. Intentá nuevamente.', 'error');
+  }
+}
+
+function mostrarMsgCodigo(texto, tipo) {
+  const el = document.getElementById('msg-codigo');
+  el.style.display = 'block';
+  el.textContent = texto;
+  el.style.background = tipo === 'error' ? '#FCEBEB' : '#E1F5EE';
+  el.style.color = tipo === 'error' ? '#791F1F' : '#0F6E56';
+}
+
+function mostrarNoCliente() {
+  const nc = document.getElementById('bloque-no-cliente');
+  nc.style.display = nc.style.display === 'none' ? 'block' : 'none';
+}
+
+function accesoPago() {
+  alert('Próximamente disponible el pago online de $9.000.\nPor ahora contactanos a info@segurosdeart.com para coordinar el análisis.');
+}
+
+function fmtN(n){ return Math.round(n).toLocaleString('es-AR'); }
+
+async function generarAnalisis() {
+  const razon = document.getElementById('a-razon').value.trim() || 'Empresa';
+  const cuit = document.getElementById('a-cuit').value.trim();
+  const empleados = parseInt(document.getElementById('a-empleados').value) || 0;
+  const salario = parseInt(document.getElementById('a-salario').value) || 0;
+  const tipo = document.getElementById('a-tipo').value;
+  const art = document.getElementById('a-art').value || 'no especificada';
+  const litigios = document.getElementById('a-litigios').value;
+  const provincia = document.getElementById('a-provincia').value || 'no especificada';
+  const email = document.getElementById('a-email').value.trim();
+
+  if (!empleados || !salario) { alert('Ingresá la cantidad de empleados y el salario promedio.'); return; }
+
+  const btn = document.getElementById('btn-generar');
+  btn.disabled = true; btn.textContent = 'Generando análisis...';
+
+  const alicuota = tipo === 'pyme' ? 0.025 : 0.01;
+  const masaSalarial = empleados * salario;
+  const mensual = masaSalarial * alicuota;
+  const idInforme = 'FAL-' + new Date().getFullYear() + '-' + String(Math.floor(Math.random()*9000)+1000);
+  const linkInforme = 'https://fondoasistencialaboral.com.ar/informe/' + idInforme;
+
+  const html = `
+    <div style="background:#fff;border:1px solid var(--border);border-radius:16px;padding:2rem;margin-top:1rem;">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px;margin-bottom:1.25rem;">
+        <div>
+          <p style="font-size:18px;font-weight:500;margin:0 0 4px;">${razon}</p>
+          <p style="font-size:12px;color:var(--muted);margin:0;">${cuit ? 'CUIT ' + cuit + ' · ' : ''}${tipo === 'pyme' ? 'MiPyME' : 'Gran empresa'} · ${empleados} empleados · ART: ${art}</p>
+        </div>
+        <span style="font-size:11px;padding:4px 10px;border-radius:20px;background:#E1F5EE;color:#0F6E56;font-weight:500;">${idInforme}</span>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:1.25rem;">
+        ${[['Aporte mensual','$ '+fmtN(mensual),(alicuota*100).toFixed(1)+'% masa salarial'],['Costo neto','$ 0','Offset SIPA'],['Acumulado 12m','$ '+fmtN(mensual*12),'~USD '+fmtN(mensual*12/1150)],['Acumulado 36m','$ '+fmtN(mensual*36),'~USD '+fmtN(mensual*36/1150)]].map(([l,v,s])=>`
+        <div style="background:var(--green-pale);border-radius:8px;padding:.75rem;">
+          <p style="font-size:11px;color:var(--muted);margin:0 0 3px;">${l}</p>
+          <p style="font-size:16px;font-weight:500;margin:0;">${v}</p>
+          <p style="font-size:10px;color:var(--muted);margin:2px 0 0;">${s}</p>
+        </div>`).join('')}
+      </div>
+      ${[[6,17],[12,33],[24,66],[36,100]].map(([m,w])=>`
+      <div style="display:flex;align-items:center;gap:10px;padding:5px 0;border-bottom:0.5px solid var(--border);">
+        <span style="font-size:12px;color:var(--muted);width:70px;flex-shrink:0;">${m} meses</span>
+        <div style="flex:1;height:7px;background:var(--border);border-radius:4px;overflow:hidden;"><div style="width:${w}%;height:100%;background:var(--green);border-radius:4px;"></div></div>
+        <span style="font-size:12px;font-weight:500;min-width:110px;text-align:right;">$ ${fmtN(mensual*m)}</span>
+      </div>`).join('')}
+      <div id="diagnostico-ia" style="margin-top:1.25rem;padding:1rem;background:var(--green-pale);border-radius:8px;">
+        <p style="font-size:12px;font-weight:500;color:var(--green);margin:0 0 6px;text-transform:uppercase;letter-spacing:.04em;">Diagnóstico IA</p>
+        <p style="font-size:13px;color:var(--muted);margin:0;" id="texto-ia"><span style="display:inline-block;width:14px;height:14px;border:2px solid #ccc;border-top-color:var(--green);border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:6px;"></span> Generando diagnóstico personalizado...</p>
+      </div>
+      <div style="margin-top:1rem;padding:1rem;background:#FAEEDA;border-radius:8px;border-left:3px solid var(--amber);">
+        <p style="font-size:13px;color:#633806;margin:0;"><strong>Acción urgente:</strong> Abrí tu cuenta FAL antes del 1 de junio para no perder los primeros 6 meses de acumulación ($ ${fmtN(mensual*6)} de reserva irrecuperable).</p>
+      </div>
+      <div style="margin-top:1rem;display:flex;gap:8px;flex-wrap:wrap;">
+        <a href="mailto:info@segurosdeart.com?subject=Consulta FAL - ${razon}&body=Hola, generé un análisis FAL (${idInforme}) y quiero asesoramiento para implementarlo." style="padding:9px 18px;background:var(--green);color:#fff;border-radius:8px;font-size:13px;font-weight:500;text-decoration:none;">Solicitar asesoramiento →</a>
+        <button onclick="window.print()" style="padding:9px 18px;background:#fff;border:1px solid var(--border-mid);border-radius:8px;font-size:13px;cursor:pointer;font-family:inherit;">Imprimir informe</button>
+      </div>
+      <p style="font-size:11px;color:var(--muted);margin:8px 0 0;">ID del informe: <strong>${idInforme}</strong> · fondoasistencialaboral.com.ar · ${new Date().toLocaleDateString('es-AR')}</p>
+    </div>`;
+
+  document.getElementById('bloque-resultado').style.display = 'block';
+  document.getElementById('bloque-resultado').innerHTML = html;
+
+  // Registrar en CRM
+  try {
+    const params = new URLSearchParams({
+      action:'registrar', codigo:codigoActivo,
+      nombreUsuario: usuarioActivo.nombre || '',
+      empresa:razon, cuit, sector:'', provincia,
+      empleados, tipo, salario, masaSalarial:masaSalarial,
+      art, litigiosidad:litigios,
+      aportesMensual:Math.round(mensual),
+      saldo12:Math.round(mensual*12),
+      saldo24:Math.round(mensual*24),
+      saldo36:Math.round(mensual*36),
+      tipoAcceso: codigoActivo ? 'Gratuito' : 'Pago',
+      pago: codigoActivo ? 'Gratuito' : '$9.000',
+      linkInforme
+    });
+    await fetch(CRM_URL + '?' + params.toString());
+  } catch(e) { console.log('CRM error:', e); }
+
+  // Diagnóstico IA
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        model:'claude-sonnet-4-20250514', max_tokens:800,
+        messages:[{role:'user', content:`Sos consultor experto en Ley 27.802 Argentina (FAL). Analizá este caso en 3 párrafos cortos sin subtítulos: Empresa: ${razon}, ${empleados} empleados, ${tipo==='pyme'?'MiPyME':'Gran empresa'}, salario $${fmtN(salario)}, ART: ${art}, litigiosidad: ${litigios}, provincia: ${provincia}. Aporte mensual: $${fmtN(mensual)}. Saldo 12m: $${fmtN(mensual*12)}. Máximo 180 palabras, tono directo y profesional.`}]
+      })
+    });
+    const d = await res.json();
+    const texto = d.content?.find(b=>b.type==='text')?.text || '';
+    if(texto) document.getElementById('texto-ia').textContent = texto;
+    else document.getElementById('texto-ia').textContent = 'Diagnóstico no disponible en este momento. Contactanos para un análisis personalizado.';
+  } catch(e) {
+    document.getElementById('texto-ia').textContent = 'El diagnóstico IA estará disponible próximamente. Tu proyección financiera es completamente válida.';
+  }
+
+  btn.disabled = false; btn.textContent = 'Generar nuevo análisis →';
+  document.getElementById('bloque-formulario').scrollIntoView({behavior:'smooth'});
+}
+
 function toggleFAQ(el) {
   el.classList.toggle('open');
 }
