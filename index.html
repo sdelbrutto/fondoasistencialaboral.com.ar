@@ -1143,22 +1143,29 @@ async function generarAnalisis() {
     await fetch(CRM_URL + '?' + params.toString());
   } catch(e) { console.log('CRM error:', e); }
 
-  // Diagnóstico IA
+  // Diagnóstico IA via Apps Script proxy
   try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({
-        model:'claude-sonnet-4-20250514', max_tokens:800,
-        messages:[{role:'user', content:`Sos consultor experto en Ley 27.802 Argentina (FAL). Analizá este caso en 3 párrafos cortos sin subtítulos: Empresa: ${razon}, ${empleados} empleados, ${tipo==='pyme'?'MiPyME':'Gran empresa'}, salario $${fmtN(salario)}, ART: ${art}, litigiosidad: ${litigios}, provincia: ${provincia}. Aporte mensual: $${fmtN(mensual)}. Saldo 12m: $${fmtN(mensual*12)}. Máximo 180 palabras, tono directo y profesional.`}]
-      })
+    const params = new URLSearchParams({
+      action: 'diagnostico',
+      empresa: razon,
+      empleados: empleados,
+      tipo: tipo,
+      salario: salario,
+      art: art,
+      litigiosidad: litigios,
+      provincia: provincia,
+      aportesMensual: Math.round(mensual),
+      saldo12: Math.round(mensual * 12)
     });
+    const res = await fetch(CRM_URL + '?' + params.toString());
     const d = await res.json();
-    const texto = d.content?.find(b=>b.type==='text')?.text || '';
-    if(texto) document.getElementById('texto-ia').textContent = texto;
-    else document.getElementById('texto-ia').textContent = 'Diagnóstico no disponible en este momento. Contactanos para un análisis personalizado.';
+    if (d.ok && d.texto) {
+      document.getElementById('texto-ia').textContent = d.texto;
+    } else {
+      document.getElementById('texto-ia').textContent = 'Diagnóstico no disponible en este momento. Contactanos a info@segurosdeart.com para un análisis personalizado.';
+    }
   } catch(e) {
-    document.getElementById('texto-ia').textContent = 'El diagnóstico IA estará disponible próximamente. Tu proyección financiera es completamente válida.';
+    document.getElementById('texto-ia').textContent = 'Error de conexión. Tu proyección financiera es completamente válida. Contactanos a info@segurosdeart.com para el diagnóstico completo.';
   }
 
   btn.disabled = false; btn.textContent = 'Generar nuevo análisis →';
