@@ -81,6 +81,18 @@
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
 
 <style>
+@media print {
+  * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+  body * { visibility: hidden; }
+  #informe-imprimible, #informe-imprimible * { visibility: visible; }
+  #informe-imprimible { position: absolute; left: 0; top: 0; width: 100%; padding: 2rem; box-shadow: none !important; border: none !important; border-radius: 0 !important; }
+  .no-print { display: none !important; }
+  nav, footer, .alert-top { display: none !important; }
+  @page { margin: 1.5cm; size: A4; }
+}
+</style>
+
+<style>
   :root {
     --green: #0F6E56;
     --green-mid: #1D9E75;
@@ -1085,39 +1097,98 @@ async function generarAnalisis() {
   const linkInforme = 'https://fondoasistencialaboral.com.ar/informe/' + idInforme;
 
   const html = `
-    <div style="background:#fff;border:1px solid var(--border);border-radius:16px;padding:2rem;margin-top:1rem;">
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px;margin-bottom:1.25rem;">
+    <div id="informe-imprimible" style="background:#fff;border:1px solid var(--border);border-radius:16px;padding:2rem;margin-top:1rem;">
+
+      <!-- HEADER DEL INFORME -->
+      <div style="border-bottom:2px solid #0F6E56;padding-bottom:1.25rem;margin-bottom:1.5rem;display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;">
         <div>
-          <p style="font-size:18px;font-weight:500;margin:0 0 4px;">${razon}</p>
-          <p style="font-size:12px;color:var(--muted);margin:0;">${cuit ? 'CUIT ' + cuit + ' · ' : ''}${tipo === 'pyme' ? 'MiPyME' : 'Gran empresa'} · ${empleados} empleados · ART: ${art}</p>
+          <p style="font-size:11px;font-weight:500;color:#0F6E56;text-transform:uppercase;letter-spacing:.08em;margin:0 0 6px;">Informe de Análisis FAL · Ley 27.802</p>
+          <p style="font-size:22px;font-weight:600;margin:0 0 4px;color:#0D1C17;">${razon}</p>
+          <p style="font-size:13px;color:#5E7068;margin:0;">${cuit ? 'CUIT ' + cuit + ' · ' : ''}${tipo === 'pyme' ? 'MiPyME (alícuota 2,5%)' : 'Gran empresa (alícuota 1%)'} · ${empleados} empleado${empleados > 1 ? 's' : ''} · ART: ${art}</p>
         </div>
-        <span style="font-size:11px;padding:4px 10px;border-radius:20px;background:#E1F5EE;color:#0F6E56;font-weight:500;">${idInforme}</span>
+        <div style="text-align:right;">
+          <span style="display:block;font-size:11px;font-weight:500;padding:5px 12px;border-radius:20px;background:#E1F5EE;color:#0F6E56;margin-bottom:6px;">${idInforme}</span>
+          <p style="font-size:11px;color:#5E7068;margin:0;">Emitido: ${new Date().toLocaleDateString('es-AR')}</p>
+          <p style="font-size:11px;color:#5E7068;margin:2px 0 0;">fondoasistencialaboral.com.ar</p>
+        </div>
       </div>
+
+      <!-- SECCIÓN 1: PROYECCIÓN FINANCIERA -->
+      <p style="font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.06em;color:#5E7068;margin:0 0 .75rem;">1 · Proyección financiera</p>
       <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:1.25rem;">
-        ${[['Aporte mensual','$ '+fmtN(mensual),(alicuota*100).toFixed(1)+'% masa salarial'],['Costo neto','$ 0','Offset SIPA'],['Acumulado 12m','$ '+fmtN(mensual*12),'~USD '+fmtN(mensual*12/1150)],['Acumulado 36m','$ '+fmtN(mensual*36),'~USD '+fmtN(mensual*36/1150)]].map(([l,v,s])=>`
-        <div style="background:var(--green-pale);border-radius:8px;padding:.75rem;">
-          <p style="font-size:11px;color:var(--muted);margin:0 0 3px;">${l}</p>
-          <p style="font-size:16px;font-weight:500;margin:0;">${v}</p>
-          <p style="font-size:10px;color:var(--muted);margin:2px 0 0;">${s}</p>
+        ${[
+          ['Aporte mensual obligatorio', '$ '+fmtN(mensual), (alicuota*100).toFixed(1)+'% de la masa salarial'],
+          ['Costo neto adicional', '$ 0', 'Compensado con reducción SIPA'],
+          ['Saldo acumulado 12 meses', '$ '+fmtN(mensual*12), '~USD '+fmtN(mensual*12/1150)],
+          ['Saldo acumulado 36 meses', '$ '+fmtN(mensual*36), '~USD '+fmtN(mensual*36/1150)]
+        ].map(([l,v,s])=>`
+        <div style="background:#F2FBF8;border:1px solid #9FE1CB;border-radius:8px;padding:.85rem;">
+          <p style="font-size:10px;color:#0F6E56;margin:0 0 5px;line-height:1.4;">${l}</p>
+          <p style="font-size:17px;font-weight:600;margin:0;color:#0D1C17;">${v}</p>
+          <p style="font-size:10px;color:#5E7068;margin:3px 0 0;">${s}</p>
         </div>`).join('')}
       </div>
-      ${[[6,17],[12,33],[24,66],[36,100]].map(([m,w])=>`
-      <div style="display:flex;align-items:center;gap:10px;padding:5px 0;border-bottom:0.5px solid var(--border);">
-        <span style="font-size:12px;color:var(--muted);width:70px;flex-shrink:0;">${m} meses</span>
-        <div style="flex:1;height:7px;background:var(--border);border-radius:4px;overflow:hidden;"><div style="width:${w}%;height:100%;background:var(--green);border-radius:4px;"></div></div>
-        <span style="font-size:12px;font-weight:500;min-width:110px;text-align:right;">$ ${fmtN(mensual*m)}</span>
-      </div>`).join('')}
-      <div id="diagnostico-ia" style="margin-top:1.25rem;padding:1rem;background:var(--green-pale);border-radius:8px;">
-        <p style="font-size:12px;font-weight:500;color:var(--green);margin:0 0 6px;text-transform:uppercase;letter-spacing:.04em;">Diagnóstico IA</p>
-        <p style="font-size:13px;color:var(--muted);margin:0;" id="texto-ia"><span style="display:inline-block;width:14px;height:14px;border:2px solid #ccc;border-top-color:var(--green);border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:6px;"></span> Generando diagnóstico personalizado...</p>
+
+      <!-- TABLA DE PROYECCIÓN -->
+      <div style="border:1px solid #E1F5EE;border-radius:8px;overflow:hidden;margin-bottom:1.5rem;">
+        <div style="background:#0F6E56;padding:8px 12px;display:flex;justify-content:space-between;">
+          <span style="font-size:11px;color:#fff;font-weight:500;text-transform:uppercase;letter-spacing:.05em;">Período</span>
+          <span style="font-size:11px;color:#fff;font-weight:500;text-transform:uppercase;letter-spacing:.05em;">Saldo acumulado estimado</span>
+        </div>
+        ${[[6,'6 meses (carencia — no disponible)'],[12,'12 meses'],[24,'24 meses'],[36,'36 meses — cobertura plena estimada']].map(([m,label],i)=>`
+        <div style="display:flex;align-items:center;gap:12px;padding:10px 12px;background:${i%2===0?'#fff':'#F2FBF8'};border-top:1px solid #E1F5EE;">
+          <span style="font-size:12px;color:#5E7068;min-width:220px;">${label}</span>
+          <div style="flex:1;height:8px;background:#E1F5EE;border-radius:4px;overflow:hidden;">
+            <div style="width:${Math.round((m/36)*100)}%;height:100%;background:#1D9E75;border-radius:4px;"></div>
+          </div>
+          <span style="font-size:13px;font-weight:600;color:#0D1C17;min-width:120px;text-align:right;">$ ${fmtN(mensual*m)}</span>
+        </div>`).join('')}
       </div>
-      <div style="margin-top:1rem;padding:1rem;background:#FAEEDA;border-radius:8px;border-left:3px solid var(--amber);">
-        <p style="font-size:13px;color:#633806;margin:0;"><strong>Acción urgente:</strong> Abrí tu cuenta FAL antes del 1 de junio para no perder los primeros 6 meses de acumulación ($ ${fmtN(mensual*6)} de reserva irrecuperable).</p>
+
+      <!-- SECCIÓN 2: DIAGNÓSTICO IA -->
+      <p style="font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.06em;color:#5E7068;margin:0 0 .75rem;">2 · Diagnóstico personalizado</p>
+      <div id="diagnostico-ia" style="border:1px solid #9FE1CB;border-radius:8px;padding:1.25rem;background:#F2FBF8;margin-bottom:1.25rem;">
+        <p style="font-size:13px;color:#5E7068;margin:0;line-height:1.75;" id="texto-ia">
+          <span style="display:inline-block;width:14px;height:14px;border:2px solid #ccc;border-top-color:#1D9E75;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:6px;"></span>
+          Generando diagnóstico personalizado con inteligencia artificial...
+        </p>
       </div>
-      <div style="margin-top:1rem;display:flex;gap:8px;flex-wrap:wrap;">
-        <a href="mailto:info@segurosdeart.com?subject=Consulta FAL - ${razon}&body=Hola, generé un análisis FAL (${idInforme}) y quiero asesoramiento para implementarlo." style="padding:9px 18px;background:var(--green);color:#fff;border-radius:8px;font-size:13px;font-weight:500;text-decoration:none;">Solicitar asesoramiento →</a>
-        <button onclick="window.print()" style="padding:9px 18px;background:#fff;border:1px solid var(--border-mid);border-radius:8px;font-size:13px;cursor:pointer;font-family:inherit;">Imprimir informe</button>
+
+      <!-- SECCIÓN 3: ALERTA DE ACCIÓN -->
+      <div style="border:1px solid #EF9F27;border-radius:8px;padding:1rem 1.25rem;background:#FAEEDA;margin-bottom:1.5rem;">
+        <p style="font-size:12px;font-weight:600;color:#BA7517;margin:0 0 4px;text-transform:uppercase;letter-spacing:.04em;">Acción urgente — Carencia de 6 meses</p>
+        <p style="font-size:13px;color:#633806;margin:0;line-height:1.65;">Abrí tu cuenta FAL antes del <strong>1 de junio de 2026</strong>. Cada mes de demora representa <strong>$ ${fmtN(mensual)}</strong> de reserva irrecuperable. Si no abrís la cuenta antes del vencimiento, los primeros 6 meses de aportes ($ ${fmtN(mensual*6)}) igual se descuentan de tus cargas sociales pero no quedan en tu cuenta individual.</p>
       </div>
+
+      <!-- SECCIÓN 4: PRÓXIMOS PASOS -->
+      <p style="font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.06em;color:#5E7068;margin:0 0 .75rem;">3 · Próximos pasos recomendados</p>
+      <div style="border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:1.5rem;">
+        ${[
+          ['Ahora','Designar responsable interno (RRHH, administración o contador) para gestionar la apertura FAL'],
+          ['Mayo 2026','Comparar al menos 2 entidades administradoras habilitadas por CNV (ALyC o banco con FCI)'],
+          ['Antes del 1 jun','Abrir la cuenta FAL y completar el proceso de alta en la entidad elegida'],
+          ['Junio en adelante','Configurar el débito mensual en la declaración de cargas sociales vía ARCA']
+        ].map(([fecha,desc],i)=>`
+        <div style="display:flex;gap:12px;padding:10px 12px;background:${i%2===0?'#fff':'#F2FBF8'};border-top:${i>0?'1px solid #E1F5EE':'none'};">
+          <span style="font-size:11px;font-weight:600;color:#0F6E56;min-width:100px;padding-top:1px;">${fecha}</span>
+          <span style="font-size:12px;color:#2D3E37;line-height:1.5;">${desc}</span>
+        </div>`).join('')}
+      </div>
+
+      <!-- FOOTER DEL INFORME -->
+      <div style="border-top:1px solid #E1F5EE;padding-top:1rem;display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;">
+        <div>
+          <p style="font-size:12px;font-weight:600;color:#0F6E56;margin:0 0 2px;">segurosdeart.com · Broker especialista en Riesgos del Trabajo</p>
+          <p style="font-size:11px;color:#5E7068;margin:0;">info@segurosdeart.com · fondoasistencialaboral.com.ar</p>
+          <p style="font-size:10px;color:#888780;margin:4px 0 0;">Este informe tiene carácter orientativo y no constituye asesoramiento jurídico ni financiero vinculante. La reglamentación del FAL está en proceso de instrumentación final.</p>
+        </div>
+        <div style="text-align:right;display:flex;gap:8px;flex-wrap:wrap;align-items:center;" class="no-print">
+          <a href="mailto:info@segurosdeart.com?subject=Consulta FAL - ${razon}&body=Hola, generé un análisis FAL (${idInforme}) y quiero asesoramiento." style="padding:9px 18px;background:#0F6E56;color:#fff;border-radius:8px;font-size:13px;font-weight:500;text-decoration:none;">Solicitar asesoramiento →</a>
+          <button onclick="imprimirInforme()" style="padding:9px 18px;background:#fff;border:1px solid #9FE1CB;border-radius:8px;font-size:13px;cursor:pointer;font-family:inherit;color:#0F6E56;font-weight:500;">Imprimir / Guardar PDF</button>
+        </div>
+      </div>
+
+    </div>
       <p style="font-size:11px;color:var(--muted);margin:8px 0 0;">ID del informe: <strong>${idInforme}</strong> · fondoasistencialaboral.com.ar · ${new Date().toLocaleDateString('es-AR')}</p>
     </div>`;
 
@@ -1170,6 +1241,10 @@ async function generarAnalisis() {
 
   btn.disabled = false; btn.textContent = 'Generar nuevo análisis →';
   document.getElementById('bloque-formulario').scrollIntoView({behavior:'smooth'});
+}
+
+function imprimirInforme() {
+  window.print();
 }
 
 function toggleFAQ(el) {
