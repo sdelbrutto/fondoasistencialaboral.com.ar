@@ -1305,10 +1305,45 @@ function calcularCTA() {
 }
 
 function enviarFormulario() {
-  const nombre = document.getElementById('cf-nombre').value;
-  const email = document.getElementById('cf-email').value;
+  const nombre = document.getElementById('cf-nombre').value.trim();
+  const empresa = document.getElementById('cf-empresa').value.trim();
+  const email = document.getElementById('cf-email').value.trim();
+  const empleados = document.getElementById('cf-empleados').value;
+  const consulta = document.getElementById('cf-consulta').value.trim();
+
   if (!nombre || !email) { alert('Por favor completá nombre y email.'); return; }
-  alert('¡Gracias ' + nombre + '! Recibimos tu consulta y te contactaremos pronto.');
+
+  const btn = document.querySelector('.cf-submit');
+  btn.disabled = true;
+  btn.textContent = 'Enviando...';
+
+  const params = new URLSearchParams({
+    action: 'consulta',
+    nombre, empresa, email, empleados, consulta
+  });
+
+  fetch(CRM_URL + '?' + params.toString())
+    .then(r => r.json())
+    .then(data => {
+      if (data.ok) {
+        btn.textContent = '¡Consulta enviada!';
+        btn.style.background = '#1D9E75';
+        document.getElementById('cf-nombre').value = '';
+        document.getElementById('cf-empresa').value = '';
+        document.getElementById('cf-email').value = '';
+        document.getElementById('cf-empleados').value = '';
+        document.getElementById('cf-consulta').value = '';
+      } else {
+        alert('Error al enviar. Por favor escribinos a info@segurosdeart.com');
+        btn.disabled = false;
+        btn.textContent = 'Solicitar asesoramiento gratuito →';
+      }
+    })
+    .catch(() => {
+      alert('Error de conexión. Por favor escribinos a info@segurosdeart.com');
+      btn.disabled = false;
+      btn.textContent = 'Solicitar asesoramiento gratuito →';
+    });
 }
 </script>
 </body>
